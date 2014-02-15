@@ -36,10 +36,10 @@ class WorkerManagerInterface(object):
         return (False, settings.POOL_TARGET)
 
     def register_work(self, worker_name, job_id, difficulty):
-	    now = Interfaces.timestamper.time()
-	    work_id = WorkIdGenerator.get_new_id()
-	    self.job_log.setdefault(worker_name, {})[work_id] = (job_id, difficulty, now)
-	    return work_id
+        now = Interfaces.timestamper.time()
+        work_id = WorkIdGenerator.get_new_id()
+        self.job_log.setdefault(worker_name, {})[work_id] = (job_id, difficulty, now)
+        return work_id
 
 class WorkIdGenerator(object):
     counter = 1000
@@ -82,6 +82,7 @@ class ShareManagerInterface(object):
  
     def on_submit_block(self, is_accepted, worker_name, block_header, block_hash, timestamp, ip, share_diff):
         log.info("Block %s %s" % (block_hash, 'ACCEPTED' if is_accepted else 'REJECTED'))
+        dbi.do_import(dbi, True)
         dbi.found_block([worker_name, block_header, block_hash, -1, timestamp, is_accepted, ip, self.block_height, self.prev_hash, share_diff ])
         
 class TimestamperInterface(object):
